@@ -3,16 +3,13 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
 model Lead {
-  // Primary identifiers
   id              String     @id @default(cuid())
   externalLeadId  String?    @map("lead_code")
-  
-  // Contact Information
   phone           String     @unique
   firstName       String?
   lastName        String?
@@ -20,111 +17,23 @@ model Lead {
   city            String?
   state           String?
   zip             String?
-  address         String?    @db.Text
+  address         String?
   address2        String?
   phone2          String?
   ipAddress       String?    @map("ip_address")
-  
-  // Lead Metadata
-  janglId         BigInt?    @map("jangl_id")
-  janglUrl        String?    @map("jangl_url") @db.VarChar(500)
-  sellPrice       Decimal?   @map("sell_price") @db.Decimal(10,2)
-  campaignId      BigInt?    @map("campaign_id")
-  offerId         String?    @map("offer_id")
-  sourceId        String?    @map("source_id")
-  landingPageUrl  String?    @map("landing_page_url") @db.Text
-  userAgent       String?    @map("user_agent") @db.Text
-  originallyCreated DateTime? @map("originally_created")
-  
-  // TCPA and Compliance
-  trustedFormCertUrl String?  @map("trusted_form_cert_url") @db.Text
-  tcpaCompliant     Boolean? @map("tcpa_compliant")
-  tcpaConsentText   String?  @map("tcpa_consent_text") @db.Text
-  oneToOne          String?  @map("one_to_one")
-  
-  // Driver Information (Primary Driver)
-  driverFirstName            String?  @map("driver_first_name")
-  driverLastName             String?  @map("driver_last_name")
-  driverRelationship         String?  @map("driver_relationship")
-  driverGender               String?  @map("driver_gender") @db.VarChar(1)
-  driverBirthDate           DateTime? @map("driver_birth_date") @db.Date
-  driverMaritalStatus        String?  @map("driver_marital_status")
-  driverEducation            String?  @map("driver_education")
-  driverOccupation           String?  @map("driver_occupation")
-  driverAgeLicensed          Int?     @map("driver_age_licensed")
-  driverLicenseState         String?  @map("driver_license_state") @db.VarChar(2)
-  driverLicenseStatus        String?  @map("driver_license_status")
-  driverLicenseEverSuspended Boolean? @map("driver_license_ever_suspended")
-  driverRequiresSr22         Boolean? @map("driver_requires_sr22")
-  driverBankruptcy           Boolean? @map("driver_bankruptcy")
-  driverMonthsAtEmployer     Int?     @map("driver_months_at_employer")
-  driverMonthsAtResidence    Int?     @map("driver_months_at_residence")
-  driverResidenceType        String?  @map("driver_residence_type")
-  
-  // Vehicle Information (Primary Vehicle)
-  vehicleYear                    Int?     @map("vehicle_year")
-  vehicleMake                    String?  @map("vehicle_make")
-  vehicleModel                   String?  @map("vehicle_model")
-  vehicleSubmodel                String?  @map("vehicle_submodel")
-  vehicleVin                     String?  @map("vehicle_vin")
-  vehicleOwnership               String?  @map("vehicle_ownership")
-  vehiclePrimaryUse              String?  @map("vehicle_primary_use")
-  vehicleAnnualMiles             Int?     @map("vehicle_annual_miles")
-  vehicleOneWayDistance          Int?     @map("vehicle_one_way_distance")
-  vehicleWeeklyCommuteDays       Int?     @map("vehicle_weekly_commute_days")
-  vehicleGarage                  String?  @map("vehicle_garage")
-  vehicleFourWheelDrive          Boolean? @map("vehicle_four_wheel_drive")
-  vehicleAirbags                 Boolean? @map("vehicle_airbags")
-  vehicleAbs                     Boolean? @map("vehicle_abs")
-  vehicleAutomaticSeatBelts      Boolean? @map("vehicle_automatic_seat_belts")
-  vehicleAlarm                   String?  @map("vehicle_alarm")
-  vehicleSalvaged                Boolean? @map("vehicle_salvaged")
-  vehicleRental                  Boolean? @map("vehicle_rental")
-  vehicleTowing                  Boolean? @map("vehicle_towing")
-  vehicleCollisionDeductible     String?  @map("vehicle_collision_deductible")
-  vehicleComprehensiveDeductible String?  @map("vehicle_comprehensive_deductible")
-  
-  // Policy Information
-  requestedCoverageType    String?  @map("requested_coverage_type")
-  requestedPropertyDamage  Int?     @map("requested_property_damage")
-  requestedBodilyInjury    String?  @map("requested_bodily_injury")
-  hasCurrentPolicy         Boolean? @map("has_current_policy")
-  
-  // Counts for multiple items
-  totalDrivers     Int @default(1) @map("total_drivers")
-  totalVehicles    Int @default(1) @map("total_vehicles")
-  totalAccidents   Int @default(0) @map("total_accidents")
-  totalTickets     Int @default(0) @map("total_tickets")
-  totalViolations  Int @default(0) @map("total_violations")
-  totalClaims      Int @default(0) @map("total_claims")
-  
-  // Lead Processing Status
-  status           LeadStatus @default(NEW)
-  insuranceStatus  String?
-  
-  // Ringba Integration
-  ringbaBid        Float?
-  ringbaBuyerId    String?
-  ringbaToken      String?
-  
-  // Full JSON Storage
-  fullPayload      Json
-  extraData        Json?      @map("extra_data")
-  
-  // Timestamps
-  leadTimestamp    DateTime?  @map("lead_timestamp")
-  createdAt        DateTime   @default(now())
-  pingedAt         DateTime?
-  postedAt         DateTime?
+  fullPayload     Json
+  status          LeadStatus @default(NEW)
+  insuranceStatus String?
+  ringbaBid       Float?
+  ringbaBuyerId   String?
+  ringbaToken     String?
+  createdAt       DateTime   @default(now())
+  pingedAt        DateTime?
+  postedAt        DateTime?
 
   @@index([externalLeadId])
   @@index([status])
   @@index([createdAt])
-  @@index([campaignId])
-  @@index([state, zip])
-  @@index([driverBirthDate])
-  @@index([vehicleYear, vehicleMake])
-  @@unique([janglId])
   @@map("leads")
 }
 
