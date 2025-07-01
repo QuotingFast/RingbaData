@@ -1,0 +1,40 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Lead {
+  id              String     @id @default(cuid())
+  externalLeadId  String?    @map("lead_code")
+  phone           String     @unique
+  firstName       String?
+  lastName        String?
+  state           String?
+  zip             String?
+  insuranceStatus String?
+  fullPayload     Json
+  status          LeadStatus @default(NEW)
+  ringbaBid       Float?
+  ringbaBuyerId   String?
+  ringbaToken     String?
+  createdAt       DateTime   @default(now())
+  pingedAt        DateTime?
+  postedAt        DateTime?
+
+  @@index([externalLeadId])
+  @@index([status])
+  @@index([createdAt])
+  @@map("leads")
+}
+
+enum LeadStatus {
+  NEW
+  PINGED
+  ACCEPTED
+  REJECTED
+  POSTED
+}
