@@ -7,10 +7,12 @@ const path = require('path');
 const router = express.Router();
 const prisma = new PrismaClient();
 
+// Serve the admin dashboard HTML
 router.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, '../public/admin/index.html'));
 });
 
+// API endpoint for leads data
 router.get('/leads', [
   query('page').optional().isInt({ min: 1 }),
   query('limit').optional().isInt({ min: 1, max: 100 }),
